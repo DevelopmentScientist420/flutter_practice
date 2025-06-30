@@ -18,6 +18,7 @@ class Footer extends StatelessWidget {
               if (constraints.maxWidth < 768) {
                 return _buildMobileFooter(context);
               }
+
               // Desktop/Tablet layout
               return _buildDesktopFooter(context);
             },
@@ -35,7 +36,7 @@ class Footer extends StatelessWidget {
         _buildLogoSection(),
         const SizedBox(height: 32),
         
-        // Links sections stacked vertically
+        // Links sections stacked vertically with sized box
         _buildQuickLinksSection(),
         const SizedBox(height: 24),
         _buildServicesSection(),
@@ -284,8 +285,10 @@ class Footer extends StatelessWidget {
   }
 
   Widget _buildCopyrightSection() {
+    final DateTime year = DateTime.now(); // Get current year
+
     return Text(
-      '© 2025 Test Bank. All rights reserved.',
+      '© 2025 - ${year.year} Test Bank. All rights reserved.',
       style: TextStyle(
         color: Colors.grey[500],
         fontSize: 12,

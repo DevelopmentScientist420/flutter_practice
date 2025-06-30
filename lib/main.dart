@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bank_app/views/home/home_view.dart';
+import 'package:bank_app/bank_app.dart';
 
 void main() {
   runApp(const MyApp());
