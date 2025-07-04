@@ -156,6 +156,7 @@ class _PostsListState extends State<PostsList> {
     );
   }
 
+// Modal card
   void _showPostDialog(BuildContext context, Post post) {
     showDialog(
       context: context,
