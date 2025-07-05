@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import '../../services/ollama_service.dart';
 
 class ChatbotWidget extends StatefulWidget {
   final bool isVisible;
   final VoidCallback onClose;
+  final String? financialContext;
 
   const ChatbotWidget({
     super.key,
     required this.isVisible,
     required this.onClose,
+    this.financialContext,
   });
 
   @override
@@ -48,7 +51,7 @@ class _ChatbotWidgetState extends State<ChatbotWidget>
 
     // Add welcome message
     _messages.add(ChatMessage(
-      text: "Hi! I'm your financial assistant. I can help you analyze your spending, set savings goals, and answer questions about your finances. How can I help you today?",
+      text: "Hi! I'm your AI-powered financial assistant. I can help you analyze spending patterns, provide budgeting advice, set savings goals, and answer any questions about your finances. I'm connected to advanced AI to give you personalized financial insights. How can I help you today?",
       isBot: true,
       timestamp: DateTime.now(),
     ));
@@ -71,7 +74,7 @@ class _ChatbotWidgetState extends State<ChatbotWidget>
     super.dispose();
   }
 
-  void _sendMessage() {
+  void _sendMessage() async {
     final messageText = _messageController.text.trim();
     if (messageText.isEmpty) return;
 
@@ -85,19 +88,46 @@ class _ChatbotWidgetState extends State<ChatbotWidget>
 
     _messageController.clear();
 
-    // Simulate bot response
-    Future.delayed(const Duration(milliseconds: 800), () {
+    // Add typing indicator
+    setState(() {
+      _messages.add(ChatMessage(
+        text: "Thinking...",
+        isBot: true,
+        timestamp: DateTime.now(),
+        isTyping: true,
+      ));
+    });
+
+    try {
+      // Get response from Ollama LLM
+      final response = await OllamaService.sendMessage(
+        messageText,
+        context: widget.financialContext,
+      );
+
+      // Remove typing indicator and add actual response
       setState(() {
+        _messages.removeWhere((msg) => msg.isTyping);
         _messages.add(ChatMessage(
-          text: _generateBotResponse(messageText),
+          text: response,
           isBot: true,
           timestamp: DateTime.now(),
         ));
       });
-    });
+    } catch (e) {
+      // Remove typing indicator and add fallback response
+      setState(() {
+        _messages.removeWhere((msg) => msg.isTyping);
+        _messages.add(ChatMessage(
+          text: _generateFallbackResponse(messageText),
+          isBot: true,
+          timestamp: DateTime.now(),
+        ));
+      });
+    }
   }
 
-  String _generateBotResponse(String userMessage) {
+  String _generateFallbackResponse(String userMessage) {
     final message = userMessage.toLowerCase();
     
     if (message.contains('spending') || message.contains('expenses')) {
@@ -113,7 +143,7 @@ class _ChatbotWidgetState extends State<ChatbotWidget>
     } else if (message.contains('help')) {
       return "I can help you with:\n• Analyzing your spending patterns\n• Setting and tracking budgets\n• Creating savings goals\n• Getting spending alerts\n• Financial tips and insights\n\nJust ask me anything about your finances!";
     } else {
-      return "That's an interesting question! While I'm still learning, I can definitely help you with spending analysis, budgeting, savings goals, and financial insights. Try asking me about your expenses or savings!";
+      return "I'm currently experiencing some technical difficulties with my AI brain, but I can still help you with basic financial questions! Try asking about spending analysis, budgeting, or savings goals.";
     }
   }
 
@@ -277,15 +307,39 @@ class _ChatbotWidgetState extends State<ChatbotWidget>
                     : Colors.cyan,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Text(
-                message.text,
-                style: TextStyle(
-                  color: message.isBot 
-                      ? Colors.grey[800] 
-                      : Colors.white,
-                  fontSize: 14,
-                ),
-              ),
+              child: message.isTyping
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.cyan[700]!,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          message.text,
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Text(
+                      message.text,
+                      style: TextStyle(
+                        color: message.isBot 
+                            ? Colors.grey[800] 
+                            : Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
             ),
           ),
           if (!message.isBot) ...[
@@ -310,10 +364,12 @@ class ChatMessage {
   final String text;
   final bool isBot;
   final DateTime timestamp;
+  final bool isTyping;
 
   ChatMessage({
     required this.text,
     required this.isBot,
     required this.timestamp,
+    this.isTyping = false,
   });
 }

@@ -10,7 +10,12 @@ import '../widgets/spending_recommendations_widget.dart';
 import '../widgets/spending_alerts_widget.dart';
 
 class ExpenseAnalysisWidget extends StatefulWidget {
-  const ExpenseAnalysisWidget({super.key});
+  final ValueChanged<Map<String, dynamic>>? onDataChanged;
+  
+  const ExpenseAnalysisWidget({
+    super.key,
+    this.onDataChanged,
+  });
 
   @override
   State<ExpenseAnalysisWidget> createState() => _ExpenseAnalysisWidgetState();
@@ -416,5 +421,45 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
       _monthlyExpenses = monthlyExpenses;
       _isLoading = false;
     });
+
+    // Notify parent about the data change
+    _notifyDataChanged();
+  }
+
+  Map<String, dynamic> get financialSummary {
+    if (_allExpenses.isEmpty) return {};
+    
+    // Calculate total expenses (only debits - negative amounts, displayed as positive)
+    double totalExpenses = _allExpenses
+        .where((expense) => expense.amount < 0)
+        .fold(0.0, (sum, expense) => sum + expense.amount.abs());
+    
+    // Calculate total income (only credits - positive amounts)
+    double totalIncome = _allExpenses
+        .where((expense) => expense.amount > 0)
+        .fold(0.0, (sum, expense) => sum + expense.amount);
+    
+    // Calculate net amount (income - expenses)
+    double netAmount = totalIncome - totalExpenses;
+    
+    // Get recent transactions (last 5)
+    List<String> recentTransactions = _allExpenses
+        .take(5)
+        .map((e) => "${e.description} (€${e.amount.abs().toStringAsFixed(2)})")
+        .toList();
+    
+    return {
+      'totalExpenses': totalExpenses,
+      'totalIncome': totalIncome,
+      'netAmount': netAmount,
+      'categoryBreakdown': Map<String, double>.from(_typeData),
+      'recentTransactions': recentTransactions,
+    };
+  }
+
+  void _notifyDataChanged() {
+    if (widget.onDataChanged != null) {
+      widget.onDataChanged!(financialSummary);
+    }
   }
 }
