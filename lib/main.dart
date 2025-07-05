@@ -12,11 +12,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Test Bank',
+      title: 'Money Saver',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
-      home: HomeView(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomeView(),
+        '/expenses': (context) => const ExpenseAnalysisView(),
+      },
     );
   }
 }

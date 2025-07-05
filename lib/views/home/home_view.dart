@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart' hide NavigationBar;
 import 'package:bank_app/views/widgets/navigation/navigation_bar.dart';
-import 'package:bank_app/views/widgets/posts/posts_list.dart';
 import 'package:bank_app/views/widgets/footer/footer.dart';
 
 class HomeView extends StatelessWidget {
@@ -48,7 +47,6 @@ class HomeView extends StatelessWidget {
                           // Posts list with constrained height
                           SizedBox(
                             height: MediaQuery.of(context).size.height - 300, // Adjust based on header/nav height
-                            child: const PostsList(),
                           ),
                         ],
                       ),

@@ -36,14 +36,6 @@ class Footer extends StatelessWidget {
         _buildLogoSection(),
         const SizedBox(height: 32),
         
-        // Links sections stacked vertically with sized box
-        _buildQuickLinksSection(),
-        const SizedBox(height: 24),
-        _buildServicesSection(),
-        const SizedBox(height: 24),
-        _buildContactSection(),
-        const SizedBox(height: 32),
-        
         // Social media
         _buildSocialMediaSection(),
         const SizedBox(height: 32),
@@ -66,23 +58,7 @@ class Footer extends StatelessWidget {
               child: _buildLogoSection(),
             ),
             const SizedBox(width: 40),
-            
-            // Quick Links
-            Expanded(
-              child: _buildQuickLinksSection(),
-            ),
             const SizedBox(width: 40),
-            
-            // Services
-            Expanded(
-              child: _buildServicesSection(),
-            ),
-            const SizedBox(width: 40),
-            
-            // Contact
-            Expanded(
-              child: _buildContactSection(),
-            ),
           ],
         ),
         const SizedBox(height: 40),
@@ -111,7 +87,7 @@ class Footer extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'TEST BANK',
+          'MONEY SAVER',
           style: TextStyle(
             color: Colors.white,
             fontSize: 24,
@@ -120,7 +96,7 @@ class Footer extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          'Your trusted financial partner providing secure banking solutions and exceptional customer service.',
+          'Your trusted assistant to prevent your wallet from burning.',
           style: TextStyle(
             color: Colors.grey[400],
             fontSize: 14,
@@ -129,120 +105,6 @@ class Footer extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  Widget _buildQuickLinksSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Quick Links',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 16),
-        ..._buildLinksList([
-          'Home',
-          'About Us',
-          'Services',
-          'Contact',
-          'Privacy Policy',
-        ]),
-      ],
-    );
-  }
-
-  Widget _buildServicesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Services',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 16),
-        ..._buildLinksList([
-          'Personal Banking',
-          'Business Banking',
-          'Loans & Mortgages',
-          'Investments',
-          'Insurance',
-        ]),
-      ],
-    );
-  }
-
-  Widget _buildContactSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Contact Info',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 16),
-        _buildContactItem(Icons.phone, '+1 (555) 123-4567'),
-        _buildContactItem(Icons.email, 'info@testbank.com'),
-        _buildContactItem(Icons.location_on, '123 Banking St, Financial District'),
-        _buildContactItem(Icons.access_time, 'Mon-Fri: 9AM-5PM'),
-      ],
-    );
-  }
-
-  Widget _buildContactItem(IconData icon, String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            icon,
-            color: Colors.grey[400],
-            size: 16,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  List<Widget> _buildLinksList(List<String> links) {
-    return links.map((link) => Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: () {
-          // Add navigation logic here
-        },
-        child: Text(
-          link,
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 14,
-            decoration: TextDecoration.none,
-          ),
-        ),
-      ),
-    )).toList();
   }
 
   Widget _buildSocialMediaSection() {
@@ -288,7 +150,7 @@ class Footer extends StatelessWidget {
     final DateTime year = DateTime.now(); // Get current year
 
     return Text(
-      '© 2025 - ${year.year} Test Bank. All rights reserved.',
+      '© 2020 - ${year.year} Money Saver. All rights reserved.',
       style: TextStyle(
         color: Colors.grey[500],
         fontSize: 12,

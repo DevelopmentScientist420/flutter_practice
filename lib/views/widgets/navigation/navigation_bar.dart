@@ -8,6 +8,7 @@ class NavigationBar extends StatelessWidget {
     return Container(
       height: 100,
       width: double.infinity,
+      color: Colors.cyan[50],
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
       child: Center(
         child: ConstrainedBox(
@@ -17,16 +18,16 @@ class NavigationBar extends StatelessWidget {
             children: <Widget>[
               SizedBox(
                 height: 80,
-                width: 150,
+                width: 250,
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text("TEST BANK", style: TextStyle(fontSize: 24),),
+                  child: Text("MONEY SAVER", style: TextStyle(fontSize: 24),),
                 ),
               ),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  NavBarItem('Home'),
+                  NavBarItem('Expenses', onTap: () => Navigator.pushNamed(context, '/expenses')),
                   SizedBox(width: 60,),
                   NavBarItem('About'),
                 ],
@@ -41,10 +42,21 @@ class NavigationBar extends StatelessWidget {
 
 class NavBarItem extends StatelessWidget {
   final String title;
-  const NavBarItem(this.title, {super.key});
+  final VoidCallback? onTap;
+  
+  const NavBarItem(this.title, {super.key, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Text(title, style: TextStyle(fontSize: 18),);
+    return GestureDetector(
+      onTap: onTap,
+      child: Text(
+        title, 
+        style: TextStyle(
+          fontSize: 18,
+          color: onTap != null ? Colors.blue[700] : Colors.grey[800],
+        ),
+      ),
+    );
   }
 }
