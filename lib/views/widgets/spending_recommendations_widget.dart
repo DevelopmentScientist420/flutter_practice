@@ -185,14 +185,13 @@ class _SpendingRecommendationsWidgetState extends State<SpendingRecommendationsW
                 ),
               ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              'AI-powered suggestions to optimize your spending',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
+            const SizedBox(height: 4),              Text(
+                'AI-powered suggestions to optimize your spending',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                ),
               ),
-            ),
             const SizedBox(height: 16),
             SizedBox(
               height: 185,
@@ -231,8 +230,12 @@ class _SpendingRecommendationsWidgetState extends State<SpendingRecommendationsW
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: index == _currentRecommendationIndex
-                          ? Colors.orange[600]
-                          : Colors.grey[300],
+                          ? Theme.of(context).brightness == Brightness.dark
+                              ? Colors.orange[400]
+                              : Colors.orange[600]
+                          : Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[600]
+                              : Colors.grey[300],
                     ),
                   ),
                 ),
@@ -297,7 +300,7 @@ class _SpendingRecommendationsWidgetState extends State<SpendingRecommendationsW
                         recommendation.description,
                         style: TextStyle(
                           fontSize: 12, // Reduced size
-                          color: Colors.grey[700],
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
                         ),
                         maxLines: 1, // Reduced to 1 line
                         overflow: TextOverflow.ellipsis,
@@ -308,7 +311,9 @@ class _SpendingRecommendationsWidgetState extends State<SpendingRecommendationsW
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), // Reduced padding
                   decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.15),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.green[900]!.withValues(alpha: 0.4)
+                        : Colors.green.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Column(
@@ -318,7 +323,9 @@ class _SpendingRecommendationsWidgetState extends State<SpendingRecommendationsW
                         style: TextStyle(
                           fontSize: 9, // Reduced size
                           fontWeight: FontWeight.bold,
-                          color: Colors.green[700],
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.green[300]
+                              : Colors.green[700],
                         ),
                       ),
                       Text(
@@ -326,14 +333,18 @@ class _SpendingRecommendationsWidgetState extends State<SpendingRecommendationsW
                         style: TextStyle(
                           fontSize: 14, // Reduced size
                           fontWeight: FontWeight.bold,
-                          color: Colors.green[700],
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.green[300]
+                              : Colors.green[700],
                         ),
                       ),
                       Text(
                         '/month',
                         style: TextStyle(
                           fontSize: 8, // Reduced size
-                          color: Colors.green[600],
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.green[400]
+                              : Colors.green[600],
                         ),
                       ),
                     ],
@@ -345,16 +356,24 @@ class _SpendingRecommendationsWidgetState extends State<SpendingRecommendationsW
             Container(
               padding: const EdgeInsets.all(8), // Reduced padding
               decoration: BoxDecoration(
-                color: Colors.blue.withValues(alpha: 0.08),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.blue[900]!.withValues(alpha: 0.3)
+                    : Colors.blue.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
+                border: Border.all(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.blue[400]!.withValues(alpha: 0.4)
+                      : Colors.blue.withValues(alpha: 0.2),
+                ),
               ),
               child: Row(
                 children: [
                   Icon(
                     Icons.lightbulb,
                     size: 14, // Reduced size
-                    color: Colors.blue[600],
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.blue[400]
+                        : Colors.blue[600],
                   ),
                   const SizedBox(width: 6), // Reduced spacing
                   Expanded(
@@ -362,7 +381,9 @@ class _SpendingRecommendationsWidgetState extends State<SpendingRecommendationsW
                       recommendation.actionSuggestion,
                       style: TextStyle(
                         fontSize: 11, // Reduced size
-                        color: Colors.blue[700],
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.blue[300]
+                            : Colors.blue[700],
                         fontWeight: FontWeight.w500,
                       ),
                       maxLines: 2,
@@ -377,20 +398,20 @@ class _SpendingRecommendationsWidgetState extends State<SpendingRecommendationsW
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(
-                  child: Text(
+                  child:                  Text(
                     'Current: €${recommendation.currentMonthlySpend.toStringAsFixed(0)}/mo',
                     style: TextStyle(
                       fontSize: 10, // Reduced size
-                      color: Colors.grey[600],
+                      color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                     ),
                   ),
                 ),
                 Flexible(
-                  child: Text(
+                  child:                  Text(
                     'Target: ${(recommendation.suggestedReduction * 100).round()}% reduction',
                     style: TextStyle(
                       fontSize: 10, // Reduced size
-                      color: Colors.grey[600],
+                      color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -414,18 +435,28 @@ class _SpendingRecommendationsWidgetState extends State<SpendingRecommendationsW
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.green.withValues(alpha: 0.1),
-            Colors.blue.withValues(alpha: 0.1),
+            Theme.of(context).brightness == Brightness.dark
+                ? Colors.green[900]!.withValues(alpha: 0.4)
+                : Colors.green.withValues(alpha: 0.1),
+            Theme.of(context).brightness == Brightness.dark
+                ? Colors.blue[900]!.withValues(alpha: 0.4)
+                : Colors.blue.withValues(alpha: 0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.green[400]!.withValues(alpha: 0.5)
+              : Colors.green.withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         children: [
           Icon(
             Icons.savings,
-            color: Colors.green[700],
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.green[400]
+                : Colors.green[700],
             size: 24,
           ),
           const SizedBox(width: 12),
@@ -445,7 +476,7 @@ class _SpendingRecommendationsWidgetState extends State<SpendingRecommendationsW
                   'Following all recommendations could save you €${totalSavings.toStringAsFixed(0)} per month',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[700],
+                    color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
                   ),
                 ),
               ],
@@ -454,7 +485,9 @@ class _SpendingRecommendationsWidgetState extends State<SpendingRecommendationsW
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.green[700],
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.green[800]
+                  : Colors.green[700],
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -472,15 +505,17 @@ class _SpendingRecommendationsWidgetState extends State<SpendingRecommendationsW
   }
 
   Color _getPriorityColor(int priority) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     switch (priority) {
       case 1:
-        return Colors.red;
+        return isDark ? Colors.red[400]! : Colors.red[600]!;
       case 2:
-        return Colors.orange;
+        return isDark ? Colors.orange[400]! : Colors.orange[600]!;
       case 3:
-        return Colors.blue;
+        return isDark ? Colors.blue[400]! : Colors.blue[600]!;
       default:
-        return Colors.grey;
+        return isDark ? Colors.grey[400]! : Colors.grey[600]!;
     }
   }
 

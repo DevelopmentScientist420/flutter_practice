@@ -125,9 +125,15 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
               Container(
                 height: 80,
                 decoration: BoxDecoration(
-                  color: Colors.green[50],
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? Colors.green[900]!.withValues(alpha: 0.3)
+                      : Colors.green[50],
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+                  border: Border.all(
+                    color: Theme.of(context).brightness == Brightness.dark 
+                        ? Colors.green[400]!.withValues(alpha: 0.5)
+                        : Colors.green.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Center(
                   child: Row(
@@ -136,7 +142,9 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
                       Icon(
                         Icons.check_circle_outline,
                         size: 32,
-                        color: Colors.green[600],
+                        color: Theme.of(context).brightness == Brightness.dark 
+                            ? Colors.green[400]
+                            : Colors.green[600],
                       ),
                       const SizedBox(width: 12),
                       Column(
@@ -148,14 +156,18 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.green[700],
+                              color: Theme.of(context).brightness == Brightness.dark 
+                                  ? Colors.green[300]
+                                  : Colors.green[700],
                             ),
                           ),
                           Text(
                             'Your spending is within normal limits',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.green[600],
+                              color: Theme.of(context).brightness == Brightness.dark 
+                                  ? Colors.green[400]
+                                  : Colors.green[600],
                             ),
                           ),
                         ],
@@ -208,14 +220,13 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
                 ),
               ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Smart monitoring of your spending patterns',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
+            const SizedBox(height: 4),              Text(
+                'Smart monitoring of your spending patterns',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                ),
               ),
-            ),
             const SizedBox(height: 16),
             SizedBox(
               height: 140,
@@ -255,7 +266,9 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
                       shape: BoxShape.circle,
                       color: index == _currentAlertIndex
                           ? _getAlertColor(_alerts.first.type)
-                          : Colors.grey[300],
+                          : Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[600]
+                              : Colors.grey[300],
                     ),
                   ),
                 ),
@@ -329,11 +342,11 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
           ),
           const SizedBox(height: 4), // Reduced spacing
           Flexible( // Use Flexible instead of fixed space
-            child: Text(
+            child:            Text(
               alert.message,
               style: TextStyle(
                 fontSize: 12, // Reduced size
-                color: Colors.grey[700],
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -344,16 +357,24 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
             Container(
               padding: const EdgeInsets.all(6), // Reduced padding
               decoration: BoxDecoration(
-                color: Colors.blue.withValues(alpha: 0.05),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.blue[900]!.withValues(alpha: 0.3)
+                    : Colors.blue.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: Colors.blue.withValues(alpha: 0.1)),
+                border: Border.all(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.blue[400]!.withValues(alpha: 0.4)
+                      : Colors.blue.withValues(alpha: 0.1),
+                ),
               ),
               child: Row(
                 children: [
                   Icon(
                     Icons.lightbulb_outline,
                     size: 12, // Reduced size
-                    color: Colors.blue[600],
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.blue[400]
+                        : Colors.blue[600],
                   ),
                   const SizedBox(width: 4),
                   Expanded(
@@ -361,7 +382,9 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
                       alert.actionSuggestion!,
                       style: TextStyle(
                         fontSize: 10, // Reduced size
-                        color: Colors.blue[700],
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.blue[300]
+                            : Colors.blue[700],
                         fontWeight: FontWeight.w500,
                       ),
                       maxLines: 1,
@@ -381,7 +404,7 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
                   'Current: €${alert.currentValue!.toStringAsFixed(0)}',
                   style: TextStyle(
                     fontSize: 9, // Reduced size
-                    color: Colors.grey[600],
+                    color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                   ),
                 ),
                 if (alert.threshold! > 0)
@@ -389,7 +412,7 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
                     'Budget: €${alert.threshold!.toStringAsFixed(0)}',
                     style: TextStyle(
                       fontSize: 9, // Reduced size
-                      color: Colors.grey[600],
+                      color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                     ),
                   ),
               ],
@@ -401,15 +424,17 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
   }
 
   Color _getAlertColor(AlertType type) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     switch (type) {
       case AlertType.danger:
-        return Colors.red;
+        return isDark ? Colors.red[400]! : Colors.red[600]!;
       case AlertType.warning:
-        return Colors.orange;
+        return isDark ? Colors.orange[400]! : Colors.orange[600]!;
       case AlertType.info:
-        return Colors.blue;
+        return isDark ? Colors.blue[400]! : Colors.blue[600]!;
       case AlertType.success:
-        return Colors.green;
+        return isDark ? Colors.green[400]! : Colors.green[600]!;
     }
   }
 

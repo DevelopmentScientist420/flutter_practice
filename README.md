@@ -1,8 +1,10 @@
-# Flutter Money Saver App
+# Money Saver App
 
 A personal finance management application built with Flutter that helps you track expenses, manage budgets, and get AI-powered financial insights.
 
 ## Quick Setup
+
+# IMPORTANT TO NOTE, PLEASE USE THE CSV PROVIDED AT THE ROOT OF THIS PROJECT. IT USES AN ID COLUMN WHICH IS NECESSARY FOR THE CSV FUNCTIONALITY IN FLUTTER
 
 ### Prerequisites
 - [Docker](https://www.docker.com/get-started)
