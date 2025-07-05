@@ -8,6 +8,7 @@ import '../widgets/transactions_table.dart';
 import '../widgets/savings_goals_widget.dart';
 import '../widgets/spending_recommendations_widget.dart';
 import '../widgets/spending_alerts_widget.dart';
+import '../widgets/budget_widget.dart';
 
 class ExpenseAnalysisWidget extends StatefulWidget {
   final ValueChanged<Map<String, dynamic>>? onDataChanged;
@@ -187,6 +188,14 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
         
         // Summary card
         _buildSummaryCard(),
+        
+        // Budget widget
+        if (_allExpenses.isNotEmpty)
+          BudgetWidget(
+            totalExpenses: _allExpenses
+                .where((expense) => expense.amount < 0)
+                .fold(0.0, (sum, expense) => sum + expense.amount.abs()),
+          ),
         
         // Analytics section (charts)
         if (_typeData.isNotEmpty || _monthlyExpenses.isNotEmpty)
@@ -461,21 +470,5 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
     if (widget.onDataChanged != null) {
       widget.onDataChanged!(financialSummary);
     }
-  }
-
-  double _calculateTotalExpenses() {
-    return _allExpenses
-        .where((expense) => expense.amount < 0)
-        .fold(0.0, (sum, expense) => sum + expense.amount.abs());
-  }
-
-  double _calculateTotalIncome() {
-    return _allExpenses
-        .where((expense) => expense.amount > 0)
-        .fold(0.0, (sum, expense) => sum + expense.amount);
-  }
-
-  double _calculateNetAmount() {
-    return _calculateTotalIncome() - _calculateTotalExpenses();
   }
 }

@@ -4,12 +4,14 @@ export 'providers/theme_provider.dart';
 // Models
 export 'models/expense.dart';
 export 'models/saving_goal.dart';
+export 'models/monthly_budget.dart';
 
 // Services
 export 'services/expense_service.dart';
 export 'services/saving_goal_service.dart';
 export 'services/recommendation_service.dart';
 export 'services/alert_service.dart';
+export 'services/budget_service.dart';
 
 // Widgets
 
@@ -25,6 +27,7 @@ export 'views/widgets/savings_goals_widget.dart';
 export 'views/widgets/spending_recommendations_widget.dart';
 export 'views/widgets/spending_alerts_widget.dart';
 export 'views/widgets/chatbot_widget.dart';
+export 'views/widgets/budget_widget.dart';
 
 // Views
 export 'views/home/home_view.dart';

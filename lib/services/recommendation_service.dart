@@ -1,5 +1,6 @@
 import '../models/expense.dart';
 import 'expense_service.dart';
+import 'budget_service.dart';
 
 class SpendingRecommendation {
   final String category;
@@ -43,6 +44,9 @@ class RecommendationService {
     
     // Calculate average monthly spending per category
     final monthlyAverages = _calculateMonthlyAverages(monthlyExpenses);
+    
+    // Generate budget-specific recommendations first (highest priority)
+    recommendations.addAll(_generateBudgetRecommendations(expenses));
     
     // Generate different types of recommendations
     recommendations.addAll(_generateHighSpendRecommendations(categoryBreakdown, monthlyAverages));
@@ -311,5 +315,73 @@ class RecommendationService {
       default:
         return 'Reducing $category spending by $percentage% could achieve these savings';
     }
+  }
+
+  /// Generate budget-specific recommendations
+  static List<SpendingRecommendation> _generateBudgetRecommendations(List<Expense> expenses) {
+    final recommendations = <SpendingRecommendation>[];
+    
+    // Get current budget
+    final budget = BudgetService.getCurrentBudget();
+    if (budget == null) {
+      return recommendations; // No budget set, no budget recommendations
+    }
+
+    // Calculate current month's expenses
+    final now = DateTime.now();
+    final currentMonthExpenses = expenses.where((expense) {
+      return expense.date.year == now.year && 
+             expense.date.month == now.month &&
+             expense.amount < 0; // Only expenses
+    }).toList();
+
+    final totalSpent = currentMonthExpenses.fold(0.0, (sum, expense) => sum + expense.amount.abs());
+    final budgetProgress = BudgetService.getBudgetProgress(totalSpent);
+    
+    final percentage = budgetProgress['percentage'] as double;
+    final remaining = budgetProgress['remaining'] as double;
+    final isOverBudget = budgetProgress['isOverBudget'] as bool;
+
+    if (isOverBudget) {
+      // Recommend budget adjustments when over budget
+      final overage = -remaining;
+      recommendations.add(SpendingRecommendation(
+        category: 'Budget Management',
+        currentMonthlySpend: totalSpent,
+        suggestedReduction: overage / totalSpent,
+        potentialSavings: overage,
+        description: 'You\'ve exceeded your monthly budget',
+        actionSuggestion: 'Reduce spending by €${overage.toStringAsFixed(0)} to get back on track next month',
+        type: RecommendationType.highSpend,
+        priority: 1,
+      ));
+    } else if (percentage > 0.8) {
+      // Recommend careful spending when approaching budget limit
+      recommendations.add(SpendingRecommendation(
+        category: 'Budget Management',
+        currentMonthlySpend: totalSpent,
+        suggestedReduction: 0.1,
+        potentialSavings: remaining * 0.5,
+        description: 'You\'re approaching your monthly budget limit',
+        actionSuggestion: 'Be mindful of spending to stay within your €${budget.amount.toStringAsFixed(0)} budget',
+        type: RecommendationType.opportunity,
+        priority: 2,
+      ));
+    } else if (percentage < 0.5) {
+      // Recommend increasing savings when well under budget
+      final surplus = remaining;
+      recommendations.add(SpendingRecommendation(
+        category: 'Savings Opportunity',
+        currentMonthlySpend: totalSpent,
+        suggestedReduction: 0.0,
+        potentialSavings: surplus * 0.8,
+        description: 'You\'re doing great staying under budget!',
+        actionSuggestion: 'Consider saving an extra €${(surplus * 0.8).toStringAsFixed(0)} this month',
+        type: RecommendationType.opportunity,
+        priority: 3,
+      ));
+    }
+
+    return recommendations;
   }
 }

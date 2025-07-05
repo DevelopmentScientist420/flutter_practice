@@ -1,4 +1,5 @@
 import '../models/expense.dart';
+import '../services/budget_service.dart';
 
 enum AlertType {
   warning,
@@ -94,50 +95,81 @@ class AlertService {
   static List<SpendingAlert> _generateBudgetAlerts(List<Expense> currentMonthExpenses) {
     List<SpendingAlert> alerts = [];
 
-    // Group expenses by category (using type field)
-    Map<String, double> categorySpending = {};
-    for (var expense in currentMonthExpenses) {
-      categorySpending[expense.type] = 
-          (categorySpending[expense.type] ?? 0.0) + expense.amount.abs();
+    // Get the user's monthly budget
+    final budget = BudgetService.getCurrentBudget();
+    if (budget == null) {
+      return alerts; // No budget set, no budget alerts
     }
 
-    // Check each category against budget
-    for (var entry in categorySpending.entries) {
-      final category = entry.key;
-      final spent = entry.value;
-      final budget = _defaultBudgets[category] ?? 100.0;
-      final percentage = (spent / budget) * 100;
+    // Calculate total monthly spending
+    final totalSpent = currentMonthExpenses.fold(0.0, (sum, expense) => sum + expense.amount.abs());
+    final budgetProgress = BudgetService.getBudgetProgress(totalSpent);
+    
+    final percentage = budgetProgress['percentage'] as double;
+    final remaining = budgetProgress['remaining'] as double;
+    final isOverBudget = budgetProgress['isOverBudget'] as bool;
 
-      if (percentage >= 100) {
-        alerts.add(SpendingAlert(
-          title: 'Budget Exceeded!',
-          message: 'You\'ve spent €${spent.toStringAsFixed(0)} on $category this month, which is ${percentage.toStringAsFixed(0)}% of your €${budget.toStringAsFixed(0)} budget.',
-          type: AlertType.danger,
-          category: AlertCategory.budget,
-          threshold: budget,
-          currentValue: spent,
-          actionSuggestion: 'Consider reducing $category spending for the rest of the month.',
-        ));
-      } else if (percentage >= 80) {
-        alerts.add(SpendingAlert(
-          title: 'Budget Warning',
-          message: 'You\'ve spent ${percentage.toStringAsFixed(0)}% of your $category budget this month (€${spent.toStringAsFixed(0)}/€${budget.toStringAsFixed(0)}).',
-          type: AlertType.warning,
-          category: AlertCategory.budget,
-          threshold: budget,
-          currentValue: spent,
-          actionSuggestion: 'You have €${(budget - spent).toStringAsFixed(0)} left for $category this month.',
-        ));
-      } else if (percentage >= 60) {
-        alerts.add(SpendingAlert(
-          title: 'Budget Check',
-          message: 'You\'ve used ${percentage.toStringAsFixed(0)}% of your $category budget (€${spent.toStringAsFixed(0)}/€${budget.toStringAsFixed(0)}).',
-          type: AlertType.info,
-          category: AlertCategory.budget,
-          threshold: budget,
-          currentValue: spent,
-          actionSuggestion: 'You\'re on track! €${(budget - spent).toStringAsFixed(0)} remaining for $category.',
-        ));
+    // Generate budget alerts based on spending progress
+    if (isOverBudget) {
+      alerts.add(SpendingAlert(
+        title: 'Monthly Budget Exceeded!',
+        message: 'You\'ve exceeded your monthly budget of €${budget.amount.toStringAsFixed(0)} by €${(-remaining).toStringAsFixed(0)}.',
+        type: AlertType.danger,
+        category: AlertCategory.budget,
+        threshold: budget.amount,
+        currentValue: totalSpent,
+        actionSuggestion: 'Review your recent expenses and consider cutting back on non-essential spending.',
+      ));
+    } else if (percentage >= 0.9) {
+      alerts.add(SpendingAlert(
+        title: 'Budget Alert - 90% Used',
+        message: 'You\'ve used ${(percentage * 100).toStringAsFixed(0)}% of your monthly budget. Only €${remaining.toStringAsFixed(0)} remaining.',
+        type: AlertType.warning,
+        category: AlertCategory.budget,
+        threshold: budget.amount,
+        currentValue: totalSpent,
+        actionSuggestion: 'Be mindful of spending for the rest of the month to stay within budget.',
+      ));
+    } else if (percentage >= 0.75) {
+      alerts.add(SpendingAlert(
+        title: 'Budget Warning - 75% Used',
+        message: 'You\'ve used ${(percentage * 100).toStringAsFixed(0)}% of your monthly budget. €${remaining.toStringAsFixed(0)} remaining.',
+        type: AlertType.info,
+        category: AlertCategory.budget,
+        threshold: budget.amount,
+        currentValue: totalSpent,
+        actionSuggestion: 'You\'re on track but keep monitoring your spending.',
+      ));
+    }
+
+    // Also check category-wise spending against default budgets if over budget
+    if (isOverBudget) {
+      Map<String, double> categorySpending = {};
+      for (var expense in currentMonthExpenses) {
+        categorySpending[expense.type] = 
+            (categorySpending[expense.type] ?? 0.0) + expense.amount.abs();
+      }
+
+      // Find top spending categories
+      final sortedCategories = categorySpending.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+
+      for (var entry in sortedCategories.take(2)) { // Top 2 categories
+        final category = entry.key;
+        final spent = entry.value;
+        final categoryBudget = _defaultBudgets[category] ?? 100.0;
+        
+        if (spent > categoryBudget) {
+          alerts.add(SpendingAlert(
+            title: 'High $category Spending',
+            message: 'Your $category spending (€${spent.toStringAsFixed(0)}) is contributing to your budget overage.',
+            type: AlertType.info,
+            category: AlertCategory.spending,
+            threshold: categoryBudget,
+            currentValue: spent,
+            actionSuggestion: 'Consider reducing $category expenses next month.',
+          ));
+        }
       }
     }
 

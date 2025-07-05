@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../models/expense.dart';
 import '../../models/saving_goal.dart';
 import '../../services/saving_goal_service.dart';
+import '../../services/budget_service.dart';
 
 class SavingsGoalsWidget extends StatefulWidget {
   final List<MonthlyExpense> monthlyExpenses;
@@ -132,6 +133,12 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
   }
 
   Widget _buildSuggestionCard(SavingSuggestion suggestion) {
+    // Get budget context
+    final totalExpenses = widget.monthlyExpenses.isNotEmpty 
+        ? widget.monthlyExpenses.last.totalAmount 
+        : 0.0;
+    final budgetProgress = BudgetService.getBudgetProgress(totalExpenses);
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -169,6 +176,36 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
             ],
           ),
           const SizedBox(height: 12),
+          
+          // Budget context warning if over budget
+          if (budgetProgress['hasBudget'] && budgetProgress['isOverBudget']) ...[
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber, color: Colors.orange[700], size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'You\'re over your monthly budget by €${(budgetProgress['spent'] - budgetProgress['budgetAmount']).toStringAsFixed(2)}. Consider reducing expenses before setting aside savings.',
+                      style: TextStyle(
+                        color: Colors.orange[700],
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+          
           if (suggestion.suggestedMonthlySaving > 0) ...[
             Row(
               children: [
@@ -189,9 +226,27 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    suggestion.reasoning,
-                    style: const TextStyle(fontSize: 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        suggestion.reasoning,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      // Add budget-aware context
+                      if (budgetProgress['hasBudget'] && !budgetProgress['isOverBudget'])
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            'This fits within your remaining budget of €${budgetProgress['remaining'].toStringAsFixed(2)}.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.green[600],
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ],

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'budget_service.dart';
 
 class OllamaService {
   static const String _baseUrl = 'http://localhost:11434';
@@ -120,6 +121,23 @@ Response:''';
     
     if (netAmount != null) {
       context.writeln('Net Amount: €${netAmount.toStringAsFixed(2)}');
+    }
+
+    // Add budget information
+    final budget = BudgetService.getCurrentBudget();
+    if (budget != null && totalExpenses != null) {
+      final budgetProgress = BudgetService.getBudgetProgress(totalExpenses);
+      final percentage = budgetProgress['percentage'] as double;
+      final remaining = budgetProgress['remaining'] as double;
+      final isOverBudget = budgetProgress['isOverBudget'] as bool;
+      
+      context.writeln('Monthly Budget: €${budget.amount.toStringAsFixed(2)}');
+      context.writeln('Budget Usage: ${(percentage * 100).toStringAsFixed(1)}%');
+      if (isOverBudget) {
+        context.writeln('Budget Status: OVER BUDGET by €${(-remaining).toStringAsFixed(2)}');
+      } else {
+        context.writeln('Budget Remaining: €${remaining.toStringAsFixed(2)}');
+      }
     }
     
     if (categoryBreakdown != null && categoryBreakdown.isNotEmpty) {

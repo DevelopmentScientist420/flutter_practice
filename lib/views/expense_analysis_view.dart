@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/expense.dart';
 import '../services/expense_service.dart';
+import '../services/budget_service.dart';
 import 'widgets/charts/expense_pie_chart.dart';
 import 'widgets/monthly_breakdown_view.dart';
 import 'widgets/transactions_table.dart';
+import 'widgets/budget_widget.dart';
 
 class ExpenseAnalysisView extends StatefulWidget {
   const ExpenseAnalysisView({super.key});
@@ -138,6 +140,16 @@ class _ExpenseAnalysisViewState extends State<ExpenseAnalysisView> {
               padding: const EdgeInsets.all(16),
               child: TransactionsTable(expenses: _allExpenses),
             ),
+          // Add budget widget
+          if (_allExpenses.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: BudgetWidget(
+                totalExpenses: _allExpenses
+                    .where((expense) => expense.amount < 0)
+                    .fold(0.0, (sum, expense) => sum + expense.amount.abs()),
+              ),
+            ),
         ],
       ),
     );
@@ -157,21 +169,8 @@ class _ExpenseAnalysisViewState extends State<ExpenseAnalysisView> {
     // Calculate net amount (income - expenses)
     double netAmount = totalIncome - totalExpenses;
     
-    // Calculate average monthly expenses from actual expenses only
-    double averageMonthlyExpenses = 0.0;
-    if (_allExpenses.isNotEmpty) {
-      // Get date range
-      final dates = _allExpenses.map((e) => e.date).toList();
-      dates.sort();
-      final earliestDate = dates.first;
-      final latestDate = dates.last;
-      
-      // Calculate number of months
-      int monthsDiff = (latestDate.year - earliestDate.year) * 12 + 
-                      (latestDate.month - earliestDate.month) + 1;
-      
-      averageMonthlyExpenses = monthsDiff > 0 ? totalExpenses / monthsDiff : totalExpenses;
-    }
+    // Get budget progress information
+    final budgetProgress = BudgetService.getBudgetProgress(totalExpenses);
 
     return Card(
       elevation: 4,
@@ -212,6 +211,82 @@ class _ExpenseAnalysisViewState extends State<ExpenseAnalysisView> {
                 ),
               ],
             ),
+            // Add budget progress if budget is set
+            if (budgetProgress['hasBudget'])
+              Column(
+                children: [
+                  const SizedBox(height: 20),
+                  const Divider(),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Icon(
+                        budgetProgress['isOverBudget'] 
+                            ? Icons.warning_amber_rounded 
+                            : Icons.trending_flat,
+                        color: budgetProgress['isOverBudget'] 
+                            ? Colors.red 
+                            : Colors.green,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Monthly Budget Progress',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  LinearProgressIndicator(
+                    value: (budgetProgress['percentage'] as double).clamp(0.0, 1.0),
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      budgetProgress['isOverBudget'] ? Colors.red : Colors.green,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Spent: €${budgetProgress['spent'].toStringAsFixed(2)}',
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                      Text(
+                        'Budget: €${budgetProgress['budgetAmount'].toStringAsFixed(2)}',
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                  if (budgetProgress['isOverBudget'])
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        'Over budget by €${(budgetProgress['spent'] - budgetProgress['budgetAmount']).toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 12, 
+                          color: Colors.red,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    )
+                  else
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        'Remaining: €${budgetProgress['remaining'].toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 12, 
+                          color: Colors.green,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
           ],
         ),
       ),
