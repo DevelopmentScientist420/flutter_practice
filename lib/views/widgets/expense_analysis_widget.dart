@@ -5,6 +5,8 @@ import '../../services/expense_service.dart';
 import '../widgets/charts/expense_pie_chart.dart';
 import '../widgets/monthly_breakdown_view.dart';
 import '../widgets/transactions_table.dart';
+import '../widgets/savings_goals_widget.dart';
+import '../widgets/spending_recommendations_widget.dart';
 
 class ExpenseAnalysisWidget extends StatefulWidget {
   const ExpenseAnalysisWidget({super.key});
@@ -164,12 +166,34 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
       );
     }
 
+    // Static dashboard - no carousel
     return Column(
       children: [
+        // Summary card
         _buildSummaryCard(),
+        
+        // Analytics section (charts)
         if (_typeData.isNotEmpty || _monthlyExpenses.isNotEmpty)
           _buildAnalyticsSection(),
-        // Add transactions table
+        
+        // Savings goals widget
+        if (_monthlyExpenses.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: SavingsGoalsWidget(monthlyExpenses: _monthlyExpenses),
+          ),
+        
+        // Spending recommendations widget (with carousel)
+        if (_allExpenses.isNotEmpty && _monthlyExpenses.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: SpendingRecommendationsWidget(
+              expenses: _allExpenses,
+              monthlyExpenses: _monthlyExpenses,
+            ),
+          ),
+        
+        // Transactions table
         if (_allExpenses.isNotEmpty)
           Padding(
             padding: const EdgeInsets.all(16),

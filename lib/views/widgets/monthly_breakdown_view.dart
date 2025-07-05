@@ -23,7 +23,7 @@ class MonthlyBreakdownView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Monthly Breakdown',
+                'Monthly Breakdown (Last 3 Months)',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -80,7 +80,7 @@ class MonthlyBreakdownView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Monthly Breakdown',
+              'Monthly Breakdown (Last 3 Months)',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,

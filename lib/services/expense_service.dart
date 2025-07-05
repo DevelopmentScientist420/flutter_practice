@@ -313,7 +313,7 @@ class ExpenseService {
     for (final expense in expenses) {
       // Only include actual expenses (debits - negative amounts)
       if (expense.amount < 0) {
-        String category = _categorizeExpense(expense.description);
+        String category = categorizeExpense(expense.description);
         double expenseAmount = expense.amount.abs(); // Convert to positive
         
         categoryTotals.update(
@@ -328,7 +328,7 @@ class ExpenseService {
   }
 
   /// Categorizes expenses based on merchant/description
-  static String _categorizeExpense(String description) {
+  static String categorizeExpense(String description) {
     final desc = description.toUpperCase();
     
     // Food & Dining
