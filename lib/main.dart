@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bank_app/bank_app.dart';
-import 'providers/theme_provider.dart';
 
 void main() {
   runApp(const MyApp());

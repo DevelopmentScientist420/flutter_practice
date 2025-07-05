@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 
 class Expense {
+  // Properties
   final String id;
   final DateTime date;
   final String description;
@@ -9,6 +10,7 @@ class Expense {
   final String accountNumber;
   final String currency;
 
+  // Constructor
   Expense({
     required this.id,
     required this.date,
@@ -19,6 +21,7 @@ class Expense {
     required this.currency,
   });
 
+  // Factory constructors
   factory Expense.fromCsvRow(List<String> row, Map<String, int> columnIndices) {
     try {
       return Expense(
@@ -35,7 +38,7 @@ class Expense {
     }
   }
 
-  // Helper method to create column index mapping from header row
+  // Static utility methods
   static Map<String, int> createColumnMapping(List<String> headerRow) {
     Map<String, int> columnIndices = {};
     for (int i = 0; i < headerRow.length; i++) {
@@ -71,6 +74,7 @@ class Expense {
     }
   }
 
+  // Instance methods
   @override
   String toString() {
     return 'Expense(id: $id, date: $date, description: $description, amount: $amount, type: $type, accountNumber: $accountNumber, currency: $currency)';
@@ -78,10 +82,12 @@ class Expense {
 }
 
 class MonthlyExpense {
+  // Properties
   final DateTime month;
   final double totalAmount;
   final List<Expense> expenses;
 
+  // Constructor
   MonthlyExpense({
     required this.month,
     required this.totalAmount,

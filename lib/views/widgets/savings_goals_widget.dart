@@ -95,8 +95,8 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
                   icon: Icon(_showAddGoalForm ? Icons.close : Icons.add),
                   label: Text(_showAddGoalForm ? 'Cancel' : 'Add Goal'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.cyan,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
               ],
@@ -144,13 +144,13 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.cyan.withValues(alpha: 0.1),
-            Colors.blue.withValues(alpha: 0.1),
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.cyan.withValues(alpha: 0.3),
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -161,7 +161,7 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
             children: [
               Icon(
                 Icons.lightbulb_outline,
-                color: Colors.cyan[700],
+                color: Theme.of(context).colorScheme.primary,
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -170,7 +170,7 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.cyan[700],
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],
@@ -182,19 +182,19 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.orange.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                border: Border.all(color: Theme.of(context).colorScheme.error.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.warning_amber, color: Colors.orange[700], size: 18),
+                  Icon(Icons.warning_amber, color: Theme.of(context).colorScheme.error, size: 18),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'You\'re over your monthly budget by €${(budgetProgress['spent'] - budgetProgress['budgetAmount']).toStringAsFixed(2)}. Consider reducing expenses before setting aside savings.',
                       style: TextStyle(
-                        color: Colors.orange[700],
+                        color: Theme.of(context).colorScheme.error,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -212,13 +212,13 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.cyan,
+                    color: Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     '€${suggestion.suggestedMonthlySaving.toStringAsFixed(0)}/month',
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
@@ -233,15 +233,16 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
                         suggestion.reasoning,
                         style: const TextStyle(fontSize: 14),
                       ),
-                      // Add budget-aware context
-                      if (budgetProgress['hasBudget'] && !budgetProgress['isOverBudget'])
+                      // Add budget-aware context                        if (budgetProgress['hasBudget'] && !budgetProgress['isOverBudget'])
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
                             'This fits within your remaining budget of €${budgetProgress['remaining'].toStringAsFixed(2)}.',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.green[600],
+                              color: Theme.of(context).brightness == Brightness.dark 
+                                  ? Colors.green[300] 
+                                  : Colors.green[600],
                               fontStyle: FontStyle.italic,
                             ),
                           ),
@@ -258,17 +259,23 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
                 _buildStatItem(
                   'Avg Income',
                   '€${suggestion.averageMonthlyIncome.toStringAsFixed(0)}',
-                  Colors.green,
+                  Theme.of(context).brightness == Brightness.dark 
+                      ? Colors.green[300]! 
+                      : Colors.green,
                 ),
                 _buildStatItem(
                   'Avg Expenses',
                   '€${suggestion.averageMonthlyExpense.toStringAsFixed(0)}',
-                  Colors.red,
+                  Theme.of(context).brightness == Brightness.dark 
+                      ? Colors.red[300]! 
+                      : Colors.red,
                 ),
                 _buildStatItem(
                   'Net Surplus',
                   '€${suggestion.potentialSaving.toStringAsFixed(0)}',
-                  Colors.blue,
+                  Theme.of(context).brightness == Brightness.dark 
+                      ? Colors.blue[300]! 
+                      : Colors.blue,
                 ),
               ],
             ),
@@ -277,7 +284,7 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
               suggestion.reasoning,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.orange[700],
+                color: Theme.of(context).colorScheme.error,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -300,9 +307,9 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
         ),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: Colors.grey,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ],
@@ -313,15 +320,15 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.grey.withValues(alpha: 0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -348,7 +355,7 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
                       goal.category,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey[600],
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
@@ -359,13 +366,17 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
                   IconButton(
                     onPressed: () => _showAddFundsDialog(goal),
                     icon: const Icon(Icons.add_circle_outline),
-                    color: Colors.green,
+                    color: Theme.of(context).brightness == Brightness.dark 
+                        ? Colors.green[300] 
+                        : Colors.green,
                     tooltip: 'Add funds',
                   ),
                   IconButton(
                     onPressed: () => _removeSavingGoal(goal.id),
                     icon: const Icon(Icons.delete_outline),
-                    color: Colors.red,
+                    color: Theme.of(context).brightness == Brightness.dark 
+                        ? Colors.red[300] 
+                        : Colors.red,
                     tooltip: 'Delete goal',
                   ),
                 ],
@@ -393,7 +404,9 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: goal.isAchieved ? Colors.green : Colors.cyan,
+                      color: goal.isAchieved 
+                          ? (Theme.of(context).brightness == Brightness.dark ? Colors.green[300] : Colors.green)
+                          : Theme.of(context).colorScheme.primary,
                     ),
                   ),
                 ],
@@ -401,9 +414,11 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
               const SizedBox(height: 6),
               LinearProgressIndicator(
                 value: goal.progressPercentage / 100,
-                backgroundColor: Colors.grey.withValues(alpha: 0.2),
+                backgroundColor: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  goal.isAchieved ? Colors.green : Colors.cyan,
+                  goal.isAchieved 
+                      ? (Theme.of(context).brightness == Brightness.dark ? Colors.green[300]! : Colors.green)
+                      : Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],
@@ -444,7 +459,7 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
               goal.description!,
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey[600],
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -460,7 +475,7 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
         Icon(
           icon,
           size: 16,
-          color: Colors.grey[600],
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
         ),
         const SizedBox(height: 4),
         Text(
@@ -474,7 +489,7 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
           label,
           style: TextStyle(
             fontSize: 10,
-            color: Colors.grey[600],
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ],
@@ -485,31 +500,34 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
     return Container(
       height: 120,
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+        ),
       ),
-      child: const Center(
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.savings_outlined,
               size: 40,
-              color: Colors.grey,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'No savings goals yet',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
             Text(
               'Click "Add Goal" to create your first savings goal',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -598,10 +616,10 @@ class _AddGoalFormState extends State<_AddGoalForm> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.grey.withValues(alpha: 0.3),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -692,11 +710,11 @@ class _AddGoalFormState extends State<_AddGoalForm> {
                 const SizedBox(height: 8),
                 
                 // Suggested amounts
-                const Text(
+                Text(
                   'Suggested amounts:',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -708,8 +726,8 @@ class _AddGoalFormState extends State<_AddGoalForm> {
                       onPressed: () {
                         _amountController.text = amount.toStringAsFixed(0);
                       },
-                      backgroundColor: Colors.cyan.withValues(alpha: 0.1),
-                      side: BorderSide(color: Colors.cyan.withValues(alpha: 0.3)),
+                      backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      side: BorderSide(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
                     );
                   }).toList() ?? [],
                 ),
@@ -764,8 +782,8 @@ class _AddGoalFormState extends State<_AddGoalForm> {
               child: ElevatedButton(
                 onPressed: _createGoal,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.cyan,
-                  foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 child: const Text('Create Goal'),

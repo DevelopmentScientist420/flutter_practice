@@ -79,7 +79,7 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
 
   Widget _buildContent() {
     if (_isLoading) {
-      return Container(
+      return SizedBox(
         height: 300,
         child: Center(
           child: Column(
@@ -112,7 +112,7 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
     }
 
     if (_errorMessage != null) {
-      return Container(
+      return SizedBox(
         height: 300,
         child: Center(
           child: Column(
@@ -145,7 +145,7 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
     }
 
     if (_allExpenses.isEmpty) {
-      return Container(
+      return SizedBox(
         height: 300,
         child: Center(
           child: Column(

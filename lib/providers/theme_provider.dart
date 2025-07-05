@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class ThemeProvider extends ChangeNotifier {
+  // Private state
   ThemeMode _themeMode = ThemeMode.light;
 
+  // Getters
   ThemeMode get themeMode => _themeMode;
-
   bool get isDarkMode => _themeMode == ThemeMode.dark;
 
+  // Public methods
   void toggleTheme() {
     _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
     notifyListeners();
@@ -17,7 +19,7 @@ class ThemeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Light theme configuration
+  // Static theme configurations
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
@@ -32,7 +34,7 @@ class ThemeProvider extends ChangeNotifier {
         foregroundColor: Colors.grey[800],
         elevation: 0,
       ),
-      cardTheme: CardThemeData(
+      cardTheme: const CardThemeData(
         elevation: 4,
         color: Colors.white,
         surfaceTintColor: Colors.white,
@@ -49,7 +51,6 @@ class ThemeProvider extends ChangeNotifier {
     );
   }
 
-  // Dark theme configuration
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
@@ -77,6 +78,42 @@ class ThemeProvider extends ChangeNotifier {
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: Colors.cyan,
         foregroundColor: Colors.white,
+      ),
+      // Text theme configurations for dark mode
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(color: Colors.white),
+        displayMedium: TextStyle(color: Colors.white),
+        displaySmall: TextStyle(color: Colors.white),
+        headlineLarge: TextStyle(color: Colors.white),
+        headlineMedium: TextStyle(color: Colors.white),
+        headlineSmall: TextStyle(color: Colors.white),
+        titleLarge: TextStyle(color: Colors.white),
+        titleMedium: TextStyle(color: Colors.white),
+        titleSmall: TextStyle(color: Colors.white),
+        bodyLarge: TextStyle(color: Colors.white),
+        bodyMedium: TextStyle(color: Colors.white),
+        bodySmall: TextStyle(color: Colors.white),
+        labelLarge: TextStyle(color: Colors.white),
+        labelMedium: TextStyle(color: Colors.white),
+        labelSmall: TextStyle(color: Colors.white),
+      ),
+      // Primary text theme for app bar and other primary surfaces
+      primaryTextTheme: const TextTheme(
+        displayLarge: TextStyle(color: Colors.white),
+        displayMedium: TextStyle(color: Colors.white),
+        displaySmall: TextStyle(color: Colors.white),
+        headlineLarge: TextStyle(color: Colors.white),
+        headlineMedium: TextStyle(color: Colors.white),
+        headlineSmall: TextStyle(color: Colors.white),
+        titleLarge: TextStyle(color: Colors.white),
+        titleMedium: TextStyle(color: Colors.white),
+        titleSmall: TextStyle(color: Colors.white),
+        bodyLarge: TextStyle(color: Colors.white),
+        bodyMedium: TextStyle(color: Colors.white),
+        bodySmall: TextStyle(color: Colors.white),
+        labelLarge: TextStyle(color: Colors.white),
+        labelMedium: TextStyle(color: Colors.white),
+        labelSmall: TextStyle(color: Colors.white),
       ),
     );
   }
