@@ -1,16 +1,51 @@
-# bank_app
+# Flutter Money Saver App
 
-A new Flutter project.
+A personal finance management application built with Flutter that helps you track expenses, manage budgets, and get AI-powered financial insights.
 
-## Getting Started
+## Quick Setup
 
-This project is a starting point for a Flutter application.
+### Prerequisites
+- [Docker](https://www.docker.com/get-started)
+- [Flutter SDK](https://flutter.dev/docs/get-started/install)
 
-A few resources to get you started if this is your first Flutter project:
+### Running the Application
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+1. **Start Ollama container**:
+   ```bash
+   docker pull ollama/ollama
+   docker run -d -p 11434:11434 --name ollama ollama/ollama
+   ```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+2. **Download the AI model**:
+   ```bash
+   docker exec -it ollama ollama pull phi3:mini
+   ```
+
+3. **Run the Flutter app**:
+   ```bash
+   flutter pub get
+   flutter run -d chrome
+   ```
+
+4. **Access the application**:
+   - **Flutter App**: URL provided when running
+
+### Stopping the Application
+```bash
+docker stop ollama
+docker rm ollama
+```
+
+## Features
+- 📊 Upload and analyze CSV bank statements
+- 💰 Set and track monthly budgets
+- 📈 Visual spending analytics with charts
+- 🎯 Create savings goals
+- 🤖 AI chatbot for financial advice (powered by Ollama)
+- 🌙 Dark/Light theme support
+
+## Usage
+1. Click "Load CSV File" to upload your bank statement
+2. Set a monthly budget to track your spending
+3. Use the chat button (💬) to ask the AI assistant about your finances
+4. Explore the analytics dashboard for insights into your spending patterns

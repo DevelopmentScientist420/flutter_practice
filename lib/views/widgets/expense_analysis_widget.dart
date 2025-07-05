@@ -101,14 +101,14 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
             'Expense Analysis',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Analyze your spending patterns and track your financial health',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Colors.grey[600],
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: .7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -167,7 +167,7 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
             const SizedBox(height: 8),
             const Text(
               'Please wait while we process your file...',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -195,7 +195,7 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
             Icon(
               Icons.error_outline,
               size: 64,
-              color: Colors.red[300],
+              color: Theme.of(context).colorScheme.error,
             ),
             const SizedBox(height: 16),
             Text(
@@ -229,17 +229,23 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
             Icon(
               Icons.insert_chart,
               size: 64,
-              color: Colors.grey[400],
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: .5),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'No expenses loaded',
-              style: TextStyle(fontSize: 18, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 18, 
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: .6)
+              ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Click the button above to load a CSV file',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 14, 
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: .6)
+              ),
             ),
           ],
         ),
@@ -252,7 +258,19 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // Spending alerts widget (at the top for priority)
+          // Financial summary card (moved to top)
+          _buildSummaryCard(),
+          
+          // Budget management widget (moved under summary)
+          if (_allExpenses.isNotEmpty)
+            BudgetWidget(
+              totalExpenses: _allExpenses
+                  .where((expense) => expense.amount < 0)
+                  .fold(0.0, (sum, expense) => sum + expense.amount.abs()),
+              onBudgetChanged: _onBudgetChanged,
+            ),
+          
+          // Spending alerts widget
           if (_allExpenses.isNotEmpty && _monthlyExpenses.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(16),
@@ -261,18 +279,6 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
                 expenses: _allExpenses,
                 monthlyExpenses: _monthlyExpenses,
               ),
-            ),
-          
-          // Financial summary card
-          _buildSummaryCard(),
-          
-          // Budget management widget
-          if (_allExpenses.isNotEmpty)
-            BudgetWidget(
-              totalExpenses: _allExpenses
-                  .where((expense) => expense.amount < 0)
-                  .fold(0.0, (sum, expense) => sum + expense.amount.abs()),
-              onBudgetChanged: _onBudgetChanged,
             ),
           
           // Analytics section (charts and visualizations)
@@ -382,9 +388,9 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
         const SizedBox(height: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: Colors.grey,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: .6),
           ),
           textAlign: TextAlign.center,
         ),
