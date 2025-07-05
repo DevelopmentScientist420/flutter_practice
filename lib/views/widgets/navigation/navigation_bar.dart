@@ -24,14 +24,6 @@ class NavigationBar extends StatelessWidget {
                   child: Text("MONEY SAVER", style: TextStyle(fontSize: 24),),
                 ),
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  NavBarItem('Expenses', onTap: () => Navigator.pushNamed(context, '/expenses')),
-                  SizedBox(width: 60,),
-                  NavBarItem('About'),
-                ],
-              ),
             ],
           ),
         ),

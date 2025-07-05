@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-class ExpensePieChart extends StatelessWidget {
+class ExpensePieChart extends StatefulWidget {
   final Map<String, double> categoryData;
 
   const ExpensePieChart({
@@ -10,9 +10,50 @@ class ExpensePieChart extends StatelessWidget {
   });
 
   @override
+  State<ExpensePieChart> createState() => _ExpensePieChartState();
+}
+
+class _ExpensePieChartState extends State<ExpensePieChart>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+    
+    // Start animation when widget is created
+    _animationController.forward();
+  }
+
+  @override
+  void didUpdateWidget(ExpensePieChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Restart animation when data changes
+    if (widget.categoryData != oldWidget.categoryData) {
+      _animationController.reset();
+      _animationController.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Handle empty data case
-    if (categoryData.isEmpty) {
+    if (widget.categoryData.isEmpty) {
       return Card(
         elevation: 4,
         margin: const EdgeInsets.all(0), // Remove margin since parent will handle spacing
@@ -90,23 +131,39 @@ class ExpensePieChart extends StatelessWidget {
               children: [
                 SizedBox(
                   height: 300,
-                  child: PieChart(
-                    PieChartData(
-                      sectionsSpace: 0, // Remove spacing to ensure visibility
-                      centerSpaceRadius: 30, // Reduced center space
-                      sections: _generatePieChartSections(),
-                      startDegreeOffset: -90, // Start from top
-                      pieTouchData: PieTouchData(
-                        enabled: true,
-                        touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                          // Handle touch events if needed
-                        },
-                      ),
-                    ),
+                  child: AnimatedBuilder(
+                    animation: _animation,
+                    builder: (context, child) {
+                      return PieChart(
+                        PieChartData(
+                          sectionsSpace: 0, // Remove spacing to ensure visibility
+                          centerSpaceRadius: 30, // Reduced center space
+                          sections: _generatePieChartSections(),
+                          startDegreeOffset: -90, // Start from top
+                          pieTouchData: PieTouchData(
+                            enabled: true,
+                            touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                              // Handle touch events if needed
+                            },
+                          ),
+                        ),
+                        // Enable built-in animation
+                        swapAnimationDuration: Duration(milliseconds: (1500 * _animation.value).toInt()),
+                        swapAnimationCurve: Curves.easeInOut,
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 16),
-                _buildHorizontalLegend(),
+                AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    return Opacity(
+                      opacity: _animation.value > 0.5 ? (_animation.value - 0.5) * 2 : 0.0,
+                      child: _buildHorizontalLegend(),
+                    );
+                  },
+                ),
               ],
             ),
           ],
@@ -116,29 +173,29 @@ class ExpensePieChart extends StatelessWidget {
   }
 
   List<PieChartSectionData> _generatePieChartSections() {
-    if (categoryData.isEmpty) {
+    if (widget.categoryData.isEmpty) {
       return [];
     }
     
     // All data should now be positive from the improved service
-    double total = categoryData.values.reduce((a, b) => a + b);
+    double total = widget.categoryData.values.reduce((a, b) => a + b);
     if (total <= 0) {
       return [];
     }
     
-    List<String> types = categoryData.keys.toList();
+    List<String> types = widget.categoryData.keys.toList();
     
     final sections = types.asMap().entries.map((entry) {
       int index = entry.key;
       String type = entry.value;
-      double amount = categoryData[type]!;
+      double amount = widget.categoryData[type]!;
       double percentage = (amount / total) * 100;
       
       return PieChartSectionData(
         color: _getColor(index),
-        value: amount,
-        title: percentage > 5 ? '${percentage.toStringAsFixed(1)}%' : '', // Only show percentage if > 5%
-        radius: 80,
+        value: amount * _animation.value, // Animate the value from 0 to full amount
+        title: percentage > 5 && _animation.value > 0.8 ? '${percentage.toStringAsFixed(1)}%' : '', // Show title only when animation is nearly complete
+        radius: 60 + (20 * _animation.value), // Animate radius from 60 to 80
         titleStyle: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.bold,
@@ -162,7 +219,7 @@ class ExpensePieChart extends StatelessWidget {
   }
 
   Widget _buildHorizontalLegend() {
-    if (categoryData.isEmpty) {
+    if (widget.categoryData.isEmpty) {
       return const Text(
         'No expense data to display',
         style: TextStyle(
@@ -173,7 +230,7 @@ class ExpensePieChart extends StatelessWidget {
     }
 
     // Create legend items
-    List<Widget> legendItems = categoryData.entries.toList().asMap().entries.map((entry) {
+    List<Widget> legendItems = widget.categoryData.entries.toList().asMap().entries.map((entry) {
       int index = entry.key;
       String type = entry.value.key;
       double amount = entry.value.value;

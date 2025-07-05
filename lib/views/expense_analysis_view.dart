@@ -4,6 +4,7 @@ import '../models/expense.dart';
 import '../services/expense_service.dart';
 import 'widgets/charts/expense_pie_chart.dart';
 import 'widgets/monthly_breakdown_view.dart';
+import 'widgets/transactions_table.dart';
 
 class ExpenseAnalysisView extends StatefulWidget {
   const ExpenseAnalysisView({super.key});
@@ -116,7 +117,7 @@ class _ExpenseAnalysisViewState extends State<ExpenseAnalysisView> {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Click the button below to load a CSV file',
+              'Click the button below to load the CSV data file given by your bank.',
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 24),
@@ -131,16 +132,33 @@ class _ExpenseAnalysisViewState extends State<ExpenseAnalysisView> {
           _buildSummaryCard(),
           if (_typeData.isNotEmpty || _monthlyExpenses.isNotEmpty)
             _buildAnalyticsSection(),
+          // Add transactions table
+          if (_allExpenses.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: TransactionsTable(expenses: _allExpenses),
+            ),
         ],
       ),
     );
   }
 
   Widget _buildSummaryCard() {
-    double totalExpenses = _allExpenses.fold(0.0, (sum, expense) => sum + expense.amount);
+    // Calculate total expenses (only debits - negative amounts, displayed as positive)
+    double totalExpenses = _allExpenses
+        .where((expense) => expense.amount < 0)
+        .fold(0.0, (sum, expense) => sum + expense.amount.abs());
     
-    // Calculate average monthly from all expenses (simple division by number of months with data)
-    double averageMonthly = 0.0;
+    // Calculate total income (only credits - positive amounts)
+    double totalIncome = _allExpenses
+        .where((expense) => expense.amount > 0)
+        .fold(0.0, (sum, expense) => sum + expense.amount);
+    
+    // Calculate net amount (income - expenses)
+    double netAmount = totalIncome - totalExpenses;
+    
+    // Calculate average monthly expenses from actual expenses only
+    double averageMonthlyExpenses = 0.0;
     if (_allExpenses.isNotEmpty) {
       // Get date range
       final dates = _allExpenses.map((e) => e.date).toList();
@@ -152,7 +170,7 @@ class _ExpenseAnalysisViewState extends State<ExpenseAnalysisView> {
       int monthsDiff = (latestDate.year - earliestDate.year) * 12 + 
                       (latestDate.month - earliestDate.month) + 1;
       
-      averageMonthly = monthsDiff > 0 ? totalExpenses / monthsDiff : totalExpenses;
+      averageMonthlyExpenses = monthsDiff > 0 ? totalExpenses / monthsDiff : totalExpenses;
     }
 
     return Card(
@@ -176,21 +194,21 @@ class _ExpenseAnalysisViewState extends State<ExpenseAnalysisView> {
               children: [
                 _buildSummaryItem(
                   'Total Expenses',
-                  '\$${totalExpenses.toStringAsFixed(2)}',
-                  Icons.attach_money,
+                  '€${totalExpenses.toStringAsFixed(2)}',
+                  Icons.trending_down,
                   Colors.red,
                 ),
                 _buildSummaryItem(
-                  'Average Monthly',
-                  '\$${averageMonthly.toStringAsFixed(2)}',
+                  'Total Income',
+                  '€${totalIncome.toStringAsFixed(2)}',
                   Icons.trending_up,
-                  Colors.blue,
+                  Colors.green,
                 ),
                 _buildSummaryItem(
-                  'Total Records',
-                  '${_allExpenses.length}',
-                  Icons.receipt,
-                  Colors.green,
+                  'Net Amount',
+                  '€${netAmount.toStringAsFixed(2)}',
+                  Icons.account_balance_wallet,
+                  netAmount >= 0 ? Colors.green : Colors.red,
                 ),
               ],
             ),
