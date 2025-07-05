@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/expense.dart';
+import 'charts/expense_line_chart.dart';
 
 class MonthlyBreakdownView extends StatelessWidget {
   final List<MonthlyExpense> monthlyExpenses;
@@ -84,6 +85,12 @@ class MonthlyBreakdownView extends StatelessWidget {
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
+            ),
+            const SizedBox(height: 16),
+            // Add the line chart
+            SizedBox(
+              height: 280,
+              child: ExpenseLineChart(monthlyExpenses: monthlyExpenses),
             ),
             const SizedBox(height: 16),
             ..._buildMonthlyItems(),
