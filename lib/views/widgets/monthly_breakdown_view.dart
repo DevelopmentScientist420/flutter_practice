@@ -139,7 +139,7 @@ class MonthlyBreakdownView extends StatelessWidget {
             ),
           ),
           subtitle: Text(
-            'Net: \$${(totalIncome - totalExpenses).toStringAsFixed(2)} | '
+            'Net: €${(totalIncome - totalExpenses).toStringAsFixed(2)} | '
             '${monthly.expenses.length} transactions',
             style: TextStyle(
               color: Colors.grey[600],
@@ -157,21 +157,21 @@ class MonthlyBreakdownView extends StatelessWidget {
                     children: [
                       _buildSummaryColumn(
                         'Expenses',
-                        '\$${totalExpenses.toStringAsFixed(2)}',
+                        '€${totalExpenses.toStringAsFixed(2)}',
                         '$expenseCount transactions',
                         Colors.red,
                         Icons.arrow_downward,
                       ),
                       _buildSummaryColumn(
                         'Income',
-                        '\$${totalIncome.toStringAsFixed(2)}',
+                        '€${totalIncome.toStringAsFixed(2)}',
                         '$incomeCount transactions',
                         Colors.green,
                         Icons.arrow_upward,
                       ),
                       _buildSummaryColumn(
                         'Net',
-                        '\$${(totalIncome - totalExpenses).toStringAsFixed(2)}',
+                        '€${(totalIncome - totalExpenses).toStringAsFixed(2)}',
                         '${monthly.expenses.length} total',
                         (totalIncome - totalExpenses) >= 0 ? Colors.green : Colors.red,
                         Icons.balance,
@@ -269,7 +269,7 @@ class MonthlyBreakdownView extends StatelessWidget {
               ),
             ),
             Text(
-              '\$${expense.amount.abs().toStringAsFixed(2)}',
+              '€${expense.amount.abs().toStringAsFixed(2)}',
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,

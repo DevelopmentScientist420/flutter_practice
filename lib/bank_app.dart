@@ -21,6 +21,7 @@ export 'views/widgets/transactions_table.dart';
 export 'views/widgets/savings_goals_widget.dart';
 export 'views/widgets/spending_recommendations_widget.dart';
 export 'views/widgets/spending_alerts_widget.dart';
+export 'views/widgets/chatbot_widget.dart';
 
 // Views
 export 'views/home/home_view.dart';
