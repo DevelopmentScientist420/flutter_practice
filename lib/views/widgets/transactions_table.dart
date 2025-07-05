@@ -95,54 +95,118 @@ class _TransactionsTableState extends State<TransactionsTable> {
   Widget _buildPaginationControls() {
     if (_totalPages <= 1) return const SizedBox.shrink();
     
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // Page info
-        Text(
-          'Page ${_currentPage + 1} of $_totalPages',
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
-        ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
         
-        // Pagination buttons
-        Row(
-          children: [
-            // First page
-            IconButton(
-              onPressed: _currentPage > 0 ? () => _goToPage(0) : null,
-              icon: const Icon(Icons.first_page),
-              tooltip: 'First Page',
-            ),
-            
-            // Previous page
-            IconButton(
-              onPressed: _currentPage > 0 ? () => _goToPage(_currentPage - 1) : null,
-              icon: const Icon(Icons.chevron_left),
-              tooltip: 'Previous Page',
-            ),
-            
-            // Page numbers (show current and adjacent pages)
-            ..._buildPageNumbers(),
-            
-            // Next page
-            IconButton(
-              onPressed: _currentPage < _totalPages - 1 ? () => _goToPage(_currentPage + 1) : null,
-              icon: const Icon(Icons.chevron_right),
-              tooltip: 'Next Page',
-            ),
-            
-            // Last page
-            IconButton(
-              onPressed: _currentPage < _totalPages - 1 ? () => _goToPage(_totalPages - 1) : null,
-              icon: const Icon(Icons.last_page),
-              tooltip: 'Last Page',
-            ),
-          ],
-        ),
-      ],
+        if (isMobile) {
+          // Mobile layout: Stack vertically and simplify controls
+          return Column(
+            children: [
+              // Page info
+              Text(
+                'Page ${_currentPage + 1} of $_totalPages',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Simplified pagination buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Previous page
+                  IconButton(
+                    onPressed: _currentPage > 0 ? () => _goToPage(_currentPage - 1) : null,
+                    icon: const Icon(Icons.chevron_left),
+                    tooltip: 'Previous Page',
+                  ),
+                  
+                  // Current page indicator
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.cyan,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      '${_currentPage + 1}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  
+                  // Next page
+                  IconButton(
+                    onPressed: _currentPage < _totalPages - 1 ? () => _goToPage(_currentPage + 1) : null,
+                    icon: const Icon(Icons.chevron_right),
+                    tooltip: 'Next Page',
+                  ),
+                ],
+              ),
+            ],
+          );
+        } else {
+          // Desktop layout: Original layout
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Page info
+              Text(
+                'Page ${_currentPage + 1} of $_totalPages',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+              
+              // Pagination buttons
+              Flexible(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      // First page
+                      IconButton(
+                        onPressed: _currentPage > 0 ? () => _goToPage(0) : null,
+                        icon: const Icon(Icons.first_page),
+                        tooltip: 'First Page',
+                      ),
+                      
+                      // Previous page
+                      IconButton(
+                        onPressed: _currentPage > 0 ? () => _goToPage(_currentPage - 1) : null,
+                        icon: const Icon(Icons.chevron_left),
+                        tooltip: 'Previous Page',
+                      ),
+                      
+                      // Page numbers (show current and adjacent pages)
+                      ..._buildPageNumbers(),
+                      
+                      // Next page
+                      IconButton(
+                        onPressed: _currentPage < _totalPages - 1 ? () => _goToPage(_currentPage + 1) : null,
+                        icon: const Icon(Icons.chevron_right),
+                        tooltip: 'Next Page',
+                      ),
+                      
+                      // Last page
+                      IconButton(
+                        onPressed: _currentPage < _totalPages - 1 ? () => _goToPage(_totalPages - 1) : null,
+                        icon: const Icon(Icons.last_page),
+                        tooltip: 'Last Page',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+      },
     );
   }
 

@@ -153,9 +153,15 @@ class _ChatbotWidgetState extends State<ChatbotWidget>
       return const SizedBox.shrink();
     }
 
+    final screenSize = MediaQuery.of(context).size;
+    final isMobile = screenSize.width < 600;
+    final chatbotWidth = isMobile ? screenSize.width - 32 : 350.0;
+    final chatbotHeight = isMobile ? screenSize.height * 0.7 : 500.0;
+
     return Positioned(
       right: 16,
       bottom: 80,
+      left: isMobile ? 16 : null,
       child: SlideTransition(
         position: _slideAnimation,
         child: FadeTransition(
@@ -164,8 +170,8 @@ class _ChatbotWidgetState extends State<ChatbotWidget>
             elevation: 8,
             borderRadius: BorderRadius.circular(16),
             child: Container(
-              width: 350,
-              height: 500,
+              width: chatbotWidth,
+              height: chatbotHeight,
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),

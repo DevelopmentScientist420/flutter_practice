@@ -273,7 +273,7 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10), // Reduced padding
       decoration: BoxDecoration(
         color: alertColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(8),
@@ -281,18 +281,19 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min, // Important: minimize height
         children: [
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(4), // Reduced padding
                 decoration: BoxDecoration(
                   color: alertColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
                   alertIcon,
-                  size: 16,
+                  size: 14, // Reduced size
                   color: alertColor,
                 ),
               ),
@@ -302,13 +303,15 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
                   alert.title,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 14, // Reduced size
                     color: alertColor,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), // Reduced padding
                 decoration: BoxDecoration(
                   color: alertColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
@@ -316,7 +319,7 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
                 child: Text(
                   _getAlertTypeText(alert.type),
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 9, // Reduced size
                     fontWeight: FontWeight.bold,
                     color: alertColor,
                   ),
@@ -324,20 +327,22 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
               ),
             ],
           ),
-          const SizedBox(height: 5),
-          Text(
-            alert.message,
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[700],
+          const SizedBox(height: 4), // Reduced spacing
+          Flexible( // Use Flexible instead of fixed space
+            child: Text(
+              alert.message,
+              style: TextStyle(
+                fontSize: 12, // Reduced size
+                color: Colors.grey[700],
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
           if (alert.actionSuggestion != null) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 4), // Reduced spacing
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6), // Reduced padding
               decoration: BoxDecoration(
                 color: Colors.blue.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(6),
@@ -347,15 +352,15 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
                 children: [
                   Icon(
                     Icons.lightbulb_outline,
-                    size: 14,
+                    size: 12, // Reduced size
                     color: Colors.blue[600],
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 4),
                   Expanded(
                     child: Text(
                       alert.actionSuggestion!,
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 10, // Reduced size
                         color: Colors.blue[700],
                         fontWeight: FontWeight.w500,
                       ),
@@ -368,14 +373,14 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
             ),
           ],
           if (alert.threshold != null && alert.currentValue != null) ...[
-            const SizedBox(height: 6),
+            const SizedBox(height: 4), // Reduced spacing
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'Current: €${alert.currentValue!.toStringAsFixed(0)}',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 9, // Reduced size
                     color: Colors.grey[600],
                   ),
                 ),
@@ -383,7 +388,7 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
                   Text(
                     'Budget: €${alert.threshold!.toStringAsFixed(0)}',
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 9, // Reduced size
                       color: Colors.grey[600],
                     ),
                   ),

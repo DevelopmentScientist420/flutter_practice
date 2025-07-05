@@ -9,21 +9,21 @@ class Footer extends StatelessWidget {
       width: double.infinity,
       color: Colors.grey[900],
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1200),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              // Mobile layout
-              if (constraints.maxWidth < 768) {
-                return _buildMobileFooter(context);
-              }
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Mobile layout
+          if (constraints.maxWidth < 768) {
+            return _buildMobileFooter(context);
+          }
 
-              // Desktop/Tablet layout
-              return _buildDesktopFooter(context);
-            },
-          ),
-        ),
+          // Desktop/Tablet layout - Center content but allow full width background
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1200),
+              child: _buildDesktopFooter(context),
+            ),
+          );
+        },
       ),
     );
   }

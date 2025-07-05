@@ -68,14 +68,21 @@ class _HomeViewState extends State<HomeView> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                Center(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: _maxContentWidth),
-                    child: ExpenseAnalysisWidget(
-                      onDataChanged: _onFinancialDataChanged,
+                // Main content with padding
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width < 600 ? 8.0 : 16.0,
+                  ),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: _maxContentWidth),
+                      child: ExpenseAnalysisWidget(
+                        onDataChanged: _onFinancialDataChanged,
+                      ),
                     ),
                   ),
                 ),
+                // Footer with no padding constraints
                 const Footer(),
               ],
             ),
