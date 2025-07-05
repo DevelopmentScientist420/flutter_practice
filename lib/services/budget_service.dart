@@ -65,7 +65,7 @@ class BudgetService {
         final jsonData = jsonEncode(_currentBudget!.toJson());
         html.window.localStorage[_storageKey] = jsonData;
       } catch (e) {
-        print('Error saving budget: $e');
+        // print('Error saving budget: $e');
       }
     }
   }
@@ -80,7 +80,7 @@ class BudgetService {
           _currentBudget = MonthlyBudget.fromJson(budgetData);
         }
       } catch (e) {
-        print('Error loading budget: $e');
+        // print('Error loading budget: $e');
       }
     }
   }
@@ -91,7 +91,7 @@ class BudgetService {
       try {
         html.window.localStorage.remove(_storageKey);
       } catch (e) {
-        print('Error clearing budget: $e');
+        // print('Error clearing budget: $e');
       }
     }
   }

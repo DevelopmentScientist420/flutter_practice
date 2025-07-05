@@ -148,8 +148,8 @@ class _ExpensePieChartState extends State<ExpensePieChart>
                           ),
                         ),
                         // Enable built-in animation
-                        swapAnimationDuration: Duration(milliseconds: (1500 * _animation.value).toInt()),
-                        swapAnimationCurve: Curves.easeInOut,
+                        duration: Duration(milliseconds: (1500 * _animation.value).toInt()),
+                        curve: Curves.easeInOut,
                       );
                     },
                   ),

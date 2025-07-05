@@ -55,6 +55,11 @@ class _SpendingAlertsWidgetState extends State<SpendingAlertsWidget>
     }
   }
 
+  // Public method to refresh alerts when budget changes
+  void refreshAlerts() {
+    _generateAlerts();
+  }
+
   @override
   void dispose() {
     _carouselTimer?.cancel();

@@ -55,6 +55,11 @@ class _SpendingRecommendationsWidgetState extends State<SpendingRecommendationsW
     }
   }
 
+  // Public method to refresh recommendations when budget changes
+  void refreshRecommendations() {
+    _generateRecommendations();
+  }
+
   @override
   void dispose() {
     _carouselTimer?.cancel();

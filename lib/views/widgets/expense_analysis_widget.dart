@@ -2,15 +2,23 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../models/expense.dart';
 import '../../services/expense_service.dart';
-import '../widgets/charts/expense_pie_chart.dart';
-import '../widgets/monthly_breakdown_view.dart';
-import '../widgets/transactions_table.dart';
-import '../widgets/savings_goals_widget.dart';
-import '../widgets/spending_recommendations_widget.dart';
-import '../widgets/spending_alerts_widget.dart';
-import '../widgets/budget_widget.dart';
+import 'charts/expense_pie_chart.dart';
+import 'monthly_breakdown_view.dart';
+import 'transactions_table.dart';
+import 'savings_goals_widget.dart';
+import 'spending_recommendations_widget.dart';
+import 'spending_alerts_widget.dart';
+import 'budget_widget.dart';
 
+/// Main widget for expense analysis dashboard
+/// 
+/// This widget orchestrates the entire expense analysis interface including:
+/// - File loading and data processing
+/// - Multiple analysis widgets (charts, tables, alerts, recommendations)
+/// - Budget management integration
+/// - Data change notifications for parent components
 class ExpenseAnalysisWidget extends StatefulWidget {
+  /// Callback triggered when financial data changes (for chatbot context)
   final ValueChanged<Map<String, dynamic>>? onDataChanged;
   
   const ExpenseAnalysisWidget({
@@ -23,211 +31,287 @@ class ExpenseAnalysisWidget extends StatefulWidget {
 }
 
 class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
+  // === DATA STATE ===
+  /// All loaded expenses from the CSV file
   List<Expense> _allExpenses = [];
+  
+  /// Monthly expense summaries for trend analysis
   List<MonthlyExpense> _monthlyExpenses = [];
+  
+  /// Expense breakdown by category/type
   Map<String, double> _typeData = {};
+  
+  // === UI STATE ===
+  /// Whether the app is currently loading data
   bool _isLoading = false;
+  
+  /// Current error message (null if no error)
   String? _errorMessage;
+  
+  /// Loading progress message
   String _loadingMessage = 'Loading...';
+  
+  /// Completer for handling loading cancellation
   Completer<void>? _loadingCompleter;
+
+  // === WIDGET KEYS FOR BUDGET CHANGE NOTIFICATIONS ===
+  /// Key for spending alerts widget to trigger refresh
+  final GlobalKey _alertsKey = GlobalKey();
+  
+  /// Key for recommendations widget to trigger refresh
+  final GlobalKey _recommendationsKey = GlobalKey();
+  
+  /// Key for savings goals widget to trigger refresh
+  final GlobalKey _savingsGoalsKey = GlobalKey();
+
+  /// Handles budget changes and refreshes dependent widgets
+  void _onBudgetChanged() {
+    // Refresh all budget-dependent widgets when budget is set/updated/cleared
+    final alertsState = _alertsKey.currentState as dynamic;
+    final recommendationsState = _recommendationsKey.currentState as dynamic;
+    final savingsGoalsState = _savingsGoalsKey.currentState as dynamic;
+    
+    // Call refresh methods if widgets are available
+    alertsState?.refreshAlerts();
+    recommendationsState?.refreshRecommendations();
+    savingsGoalsState?.refreshSuggestions();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Header Section
-        Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              Text(
-                'Expense Analysis',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[800],
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Analyze your spending patterns and track your financial health',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.grey[600],
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              // Load CSV Button
-              ElevatedButton.icon(
-                onPressed: _loadCsvFile,
-                icon: const Icon(Icons.upload_file),
-                label: const Text('Load CSV File'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.cyan,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                ),
-              ),
-            ],
-          ),
-        ),
+        // === HEADER SECTION ===
+        _buildHeaderSection(),
         
-        // Content Section
+        // === MAIN CONTENT SECTION ===
         _buildContent(),
       ],
     );
   }
 
+  /// Builds the header section with title and upload button
+  Widget _buildHeaderSection() {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        children: [
+          // Title and description
+          Text(
+            'Expense Analysis',
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[800],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Analyze your spending patterns and track your financial health',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          
+          // Load CSV Button
+          ElevatedButton.icon(
+            onPressed: _loadCsvFile,
+            icon: const Icon(Icons.upload_file),
+            label: const Text('Load CSV File'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.cyan,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  /// Builds the main content area based on current state
   Widget _buildContent() {
+    // Show loading screen during data processing
     if (_isLoading) {
-      return SizedBox(
-        height: 300,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 16),
-              Text(
-                _loadingMessage,
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Please wait while we process your file...',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _cancelLoading,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red[100],
-                  foregroundColor: Colors.red[700],
-                ),
-                child: const Text('Cancel'),
-              ),
-            ],
-          ),
-        ),
-      );
+      return _buildLoadingView();
     }
 
+    // Show error message if something went wrong
     if (_errorMessage != null) {
-      return SizedBox(
-        height: 300,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 64,
-                color: Colors.red[300],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Error: $_errorMessage',
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _errorMessage = null;
-                  });
-                },
-                child: const Text('Dismiss'),
-              ),
-            ],
-          ),
-        ),
-      );
+      return _buildErrorView();
     }
 
+    // Show empty state when no data is loaded
     if (_allExpenses.isEmpty) {
-      return SizedBox(
-        height: 300,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.insert_chart,
-                size: 64,
-                color: Colors.grey[400],
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'No expenses loaded',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Click the button above to load a CSV file',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
-        ),
-      );
+      return _buildEmptyView();
     }
 
-    // Static dashboard - no carousel
-    return Column(
-      children: [
-        // Spending alerts widget (at the top)
-        if (_allExpenses.isNotEmpty && _monthlyExpenses.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SpendingAlertsWidget(
-              expenses: _allExpenses,
-              monthlyExpenses: _monthlyExpenses,
+    // Show main analytics content when data is available
+    return _buildAnalyticsView();
+  }
+
+  /// Builds the loading view with progress indicators
+  Widget _buildLoadingView() {
+    return SizedBox(
+      height: 300,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(
+              _loadingMessage,
+              style: const TextStyle(fontSize: 16),
             ),
-          ),
-        
-        // Summary card
-        _buildSummaryCard(),
-        
-        // Budget widget
-        if (_allExpenses.isNotEmpty)
-          BudgetWidget(
-            totalExpenses: _allExpenses
-                .where((expense) => expense.amount < 0)
-                .fold(0.0, (sum, expense) => sum + expense.amount.abs()),
-          ),
-        
-        // Analytics section (charts)
-        if (_typeData.isNotEmpty || _monthlyExpenses.isNotEmpty)
-          _buildAnalyticsSection(),
-        
-        // Savings goals widget
-        if (_monthlyExpenses.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SavingsGoalsWidget(monthlyExpenses: _monthlyExpenses),
-          ),
-        
-        // Spending recommendations widget (with carousel)
-        if (_allExpenses.isNotEmpty && _monthlyExpenses.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SpendingRecommendationsWidget(
-              expenses: _allExpenses,
-              monthlyExpenses: _monthlyExpenses,
+            const SizedBox(height: 8),
+            const Text(
+              'Please wait while we process your file...',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
-          ),
-        
-        // Transactions table
-        if (_allExpenses.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TransactionsTable(expenses: _allExpenses),
-          ),
-      ],
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _cancelLoading,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[100],
+                foregroundColor: Colors.red[700],
+              ),
+              child: const Text('Cancel'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
+  /// Builds the error view with error message and dismiss button
+  Widget _buildErrorView() {
+    return SizedBox(
+      height: 300,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.red[300],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Error: $_errorMessage',
+              style: const TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _errorMessage = null;
+                });
+              },
+              child: const Text('Dismiss'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds the empty view when no data is loaded
+  Widget _buildEmptyView() {
+    return SizedBox(
+      height: 300,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.insert_chart,
+              size: 64,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'No expenses loaded',
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Click the button above to load a CSV file',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds the main analytics view with all dashboard components
+  Widget _buildAnalyticsView() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Spending alerts widget (at the top for priority)
+          if (_allExpenses.isNotEmpty && _monthlyExpenses.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: SpendingAlertsWidget(
+                key: _alertsKey,
+                expenses: _allExpenses,
+                monthlyExpenses: _monthlyExpenses,
+              ),
+            ),
+          
+          // Financial summary card
+          _buildSummaryCard(),
+          
+          // Budget management widget
+          if (_allExpenses.isNotEmpty)
+            BudgetWidget(
+              totalExpenses: _allExpenses
+                  .where((expense) => expense.amount < 0)
+                  .fold(0.0, (sum, expense) => sum + expense.amount.abs()),
+              onBudgetChanged: _onBudgetChanged,
+            ),
+          
+          // Analytics section (charts and visualizations)
+          if (_typeData.isNotEmpty || _monthlyExpenses.isNotEmpty)
+            _buildAnalyticsSection(),
+          
+          // Savings goals widget
+          if (_monthlyExpenses.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: SavingsGoalsWidget(
+                key: _savingsGoalsKey,
+                monthlyExpenses: _monthlyExpenses,
+              ),
+            ),
+          
+          // Spending recommendations widget
+          if (_allExpenses.isNotEmpty && _monthlyExpenses.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: SpendingRecommendationsWidget(
+                key: _recommendationsKey,
+                expenses: _allExpenses,
+                monthlyExpenses: _monthlyExpenses,
+              ),
+            ),
+          
+          // Detailed transactions table
+          if (_allExpenses.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: TransactionsTable(expenses: _allExpenses),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the financial summary card with key metrics
   Widget _buildSummaryCard() {
     // Calculate total expenses (only debits - negative amounts, displayed as positive)
     double totalExpenses = _allExpenses
@@ -250,14 +334,17 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Card title
             const Text(
-              'Summary',
+              'Financial Summary',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 16),
+            
+            // Summary metrics row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -287,6 +374,7 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
     );
   }
 
+  /// Builds individual summary items for the summary card
   Widget _buildSummaryItem(String title, String value, IconData icon, Color color) {
     return Column(
       children: [
@@ -298,6 +386,7 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
             fontSize: 12,
             color: Colors.grey,
           ),
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 4),
         Text(
@@ -311,14 +400,15 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
     );
   }
 
+  /// Builds the analytics section with charts and visualizations
   Widget _buildAnalyticsSection() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // On wider screens (desktop/tablet landscape), show side by side
-        // On narrower screens (mobile/tablet portrait), stack vertically
+        // Responsive layout: side-by-side on wide screens, stacked on narrow screens
         bool isWideScreen = constraints.maxWidth > 600;
         
         if (isWideScreen) {
+          // Desktop/tablet landscape layout
           return Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -331,7 +421,7 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
                     child: ExpensePieChart(categoryData: _typeData),
                   ),
                 
-                // Add spacing only if both charts exist
+                // Spacing between charts
                 if (_typeData.isNotEmpty && _monthlyExpenses.isNotEmpty)
                   const SizedBox(width: 16),
                 
@@ -345,7 +435,7 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
             ),
           );
         } else {
-          // Mobile layout - stack vertically with proper spacing
+          // Mobile/tablet portrait layout
           return Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -364,6 +454,9 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
     );
   }
 
+  // === FILE LOADING METHODS ===
+
+  /// Initiates CSV file loading process
   Future<void> _loadCsvFile() async {
     _loadingCompleter = Completer<void>();
     
@@ -397,19 +490,21 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
     }
   }
 
+  /// Cancels the current loading operation
   void _cancelLoading() {
     if (_loadingCompleter != null && !_loadingCompleter!.isCompleted) {
       _loadingCompleter!.completeError('Loading cancelled by user');
     }
   }
 
+  /// Performs the actual CSV file loading and data processing
   Future<void> _performCsvLoad() async {
     // Update loading message for different stages
     setState(() {
       _loadingMessage = 'Reading CSV file...';
     });
     
-    // For web, use the combined pick and parse method
+    // Load and parse CSV file
     List<Expense> expenses = await ExpenseService.pickAndParseCsvFile();
     
     setState(() {
@@ -419,11 +514,13 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
     // Add small delays to prevent UI blocking and show progress
     await Future.delayed(const Duration(milliseconds: 100));
     
+    // Process data for analytics
     Map<String, double> typeData = ExpenseService.getCategoryBreakdown(expenses);
     List<MonthlyExpense> monthlyExpenses = ExpenseService.getLastThreeMonthsExpenses(expenses);
     
     await Future.delayed(const Duration(milliseconds: 50));
     
+    // Update state with processed data
     setState(() {
       _allExpenses = expenses;
       _typeData = typeData;
@@ -435,20 +532,21 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
     _notifyDataChanged();
   }
 
+  // === DATA MANAGEMENT ===
+
+  /// Gets a summary of financial data for external use (e.g., chatbot)
   Map<String, dynamic> get financialSummary {
     if (_allExpenses.isEmpty) return {};
     
-    // Calculate total expenses (only debits - negative amounts, displayed as positive)
+    // Calculate key metrics
     double totalExpenses = _allExpenses
         .where((expense) => expense.amount < 0)
         .fold(0.0, (sum, expense) => sum + expense.amount.abs());
     
-    // Calculate total income (only credits - positive amounts)
     double totalIncome = _allExpenses
         .where((expense) => expense.amount > 0)
         .fold(0.0, (sum, expense) => sum + expense.amount);
     
-    // Calculate net amount (income - expenses)
     double netAmount = totalIncome - totalExpenses;
     
     // Get recent transactions (last 5)
@@ -463,9 +561,11 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
       'netAmount': netAmount,
       'categoryBreakdown': Map<String, double>.from(_typeData),
       'recentTransactions': recentTransactions,
+      'recordCount': _allExpenses.length,
     };
   }
 
+  /// Notifies parent widget about data changes
   void _notifyDataChanged() {
     if (widget.onDataChanged != null) {
       widget.onDataChanged!(financialSummary);

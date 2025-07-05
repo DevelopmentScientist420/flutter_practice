@@ -36,6 +36,11 @@ class _SavingsGoalsWidgetState extends State<SavingsGoalsWidget> {
     }
   }
 
+  // Public method to refresh suggestions when budget changes
+  void refreshSuggestions() {
+    _calculateSuggestion();
+  }
+
   void _calculateSuggestion() {
     setState(() {
       _suggestion = SavingGoalService.calculateSavingSuggestion(widget.monthlyExpenses);
