@@ -7,6 +7,7 @@ import '../widgets/monthly_breakdown_view.dart';
 import '../widgets/transactions_table.dart';
 import '../widgets/savings_goals_widget.dart';
 import '../widgets/spending_recommendations_widget.dart';
+import '../widgets/spending_alerts_widget.dart';
 
 class ExpenseAnalysisWidget extends StatefulWidget {
   const ExpenseAnalysisWidget({super.key});
@@ -169,6 +170,16 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
     // Static dashboard - no carousel
     return Column(
       children: [
+        // Spending alerts widget (at the top)
+        if (_allExpenses.isNotEmpty && _monthlyExpenses.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: SpendingAlertsWidget(
+              expenses: _allExpenses,
+              monthlyExpenses: _monthlyExpenses,
+            ),
+          ),
+        
         // Summary card
         _buildSummaryCard(),
         

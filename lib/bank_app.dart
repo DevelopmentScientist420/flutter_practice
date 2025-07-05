@@ -6,6 +6,7 @@ export 'models/saving_goal.dart';
 export 'services/expense_service.dart';
 export 'services/saving_goal_service.dart';
 export 'services/recommendation_service.dart';
+export 'services/alert_service.dart';
 
 // Widgets
 
@@ -19,6 +20,7 @@ export 'views/widgets/monthly_breakdown_view.dart';
 export 'views/widgets/transactions_table.dart';
 export 'views/widgets/savings_goals_widget.dart';
 export 'views/widgets/spending_recommendations_widget.dart';
+export 'views/widgets/spending_alerts_widget.dart';
 
 // Views
 export 'views/home/home_view.dart';
