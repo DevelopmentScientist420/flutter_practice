@@ -462,4 +462,20 @@ class _ExpenseAnalysisWidgetState extends State<ExpenseAnalysisWidget> {
       widget.onDataChanged!(financialSummary);
     }
   }
+
+  double _calculateTotalExpenses() {
+    return _allExpenses
+        .where((expense) => expense.amount < 0)
+        .fold(0.0, (sum, expense) => sum + expense.amount.abs());
+  }
+
+  double _calculateTotalIncome() {
+    return _allExpenses
+        .where((expense) => expense.amount > 0)
+        .fold(0.0, (sum, expense) => sum + expense.amount);
+  }
+
+  double _calculateNetAmount() {
+    return _calculateTotalIncome() - _calculateTotalExpenses();
+  }
 }

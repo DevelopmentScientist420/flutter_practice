@@ -167,7 +167,7 @@ class _ChatbotWidgetState extends State<ChatbotWidget>
               width: 350,
               height: 500,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
               ),
@@ -230,7 +230,9 @@ class _ChatbotWidgetState extends State<ChatbotWidget>
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.grey[50],
+                      color: Theme.of(context).brightness == Brightness.dark 
+                          ? Colors.grey[850] 
+                          : Colors.grey[50],
                       border: Border(
                         top: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                       ),
@@ -247,7 +249,9 @@ class _ChatbotWidgetState extends State<ChatbotWidget>
                                 borderSide: BorderSide.none,
                               ),
                               filled: true,
-                              fillColor: Colors.white,
+                              fillColor: Theme.of(context).brightness == Brightness.dark 
+                                  ? Colors.grey[800] 
+                                  : Colors.white,
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 12,

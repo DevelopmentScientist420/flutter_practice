@@ -1,3 +1,6 @@
+// Providers
+export 'providers/theme_provider.dart';
+
 // Models
 export 'models/expense.dart';
 export 'models/saving_goal.dart';
